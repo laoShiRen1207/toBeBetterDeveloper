@@ -1072,15 +1072,71 @@ InnoDB 实现了一下两种类型的行锁：
 
 ## 5 InnoDB 引擎
 
+InnoDB 是MySQL5.5 版本之后的默认的存储引擎。
+
 ### 5.1 逻辑存储结构
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/7cb0c00ecaca4043ac877bce74192f83.png)
 
+ 表空间（ibd文件），一个MySQL 实例可以对应多个表空间，用于存储记录、索引等数据。
 
+段（Segment），分为数据段（Leaf node segment）、索引段（Non-leaf node segment）、回滚段（Rollbak segment）。InnoDB 是索引组织表，数据段就是B+tree的叶子节点，索引段即为B+Tree的非叶子节点。段用来管理多个Extent。
 
+区（Extent）表空间的单元结构，每个区的大小为1M，默认情况下InnoDB 存储引擎页大小为16k，即一个区中一共有64个连续的页。
+
+页（Page），是InnoDB 存储引擎磁盘管理的最小单元，每个页默认大小为16k。为了保证页的连续性，InnoDB 存储引擎每次从磁盘申请4-5个区。
+
+行（Row），InnoDB 存储引擎数据是按行存放的。
+
+> Trx_id: 每次对某条记录进行改动时，都会把对应的事务id 赋值给trx_id 隐藏列
+>
+> Rool_pointer：每次对某条记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列相当于一个指针，可以通过它来找到该记录的修改前的信息。
 
 ### 5.2 架构
 
+MySQL5.5 版本开始，默认使用InnoDB 存储引擎，它擅长事务处理，具有崩溃恢复特性，在日常开发中使用非常广泛，下面是InnoDB 架构图，左侧为内存结构，右侧为磁盘结构。 
+
+![在这里插入图片描述\](https://img-blog.csdnimg.cn/7cb0c00ecaca4043ac877bce74192f83.png](https://img-blog.csdnimg.cn/2283e74ec8204095b88a9436281d2339.png)
+
 #### 内存结构
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/f3108f3468e2427abf81e0cffee424f3.png)
+
+##### Buffer Pool
+
+缓冲池是主内存中的一个区域，里面可以缓存磁盘上进场操作的真实数据，在执行增删改查操作时，先操作缓冲池的数据（若缓冲池没有数据，则从磁盘加载并缓存），然后再以一定频率刷新到磁盘，从而减少磁盘IO，加快处理速度。
+
+缓冲池有一个一个的块，叫做缓冲池。缓冲池以Page页为单位，底层采用链表数据结构管理Page。根据状态Page 被分为3类：
+
+* free page：空闲page，未被使用。
+* clean page：被使用page，数据没有被修改过。
+* dirty page：脏页，被使用page，数据被修改过，数据与磁盘的数据产生了不一致
+
+##### Change Buffer
+
+更改缓冲区（针对于非一二级所以页），在执行DML 语句时，如果这些数据Page 没有在Buffer Pool 中，不会直接操作磁盘，而会将数据变更存在缓冲区Change Buffer 中，在未来数据被读取时，再将数据合并恢复到Buffer Pool 中，再讲合并后的数据刷新到磁盘中。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/646c6d7df7044d03a75eeecb89023bdd.png)
+
+**Change Buffer的意义**
+
+与聚集索引不同，二级索引通常是非唯一的，并且以相对随机的顺序插入二级索引。同样，删除和更新可能会影响数中不相邻的二级索引页。如果每一次都操作磁盘，会造成大量磁盘IO，有了Change Buffer 之后，我们可以在缓冲池进行合并处理，减少磁盘IO。
+
+##### Adaptive Hash Index
+
+自适应hash 索引，用于优化对Buffer Pool 数据查询。InnoDB 存储引擎会监控对表上各索引的查询，如果观察到hash 索引可以提高速度，则建立hash 索引，称之为自适应hash 索引。
+
+**自适应hash 索引，无须人工干预，是系统根据情况自动完成**
+
+参数：adaptive_hash_index
+
+##### Log Buffer 
+
+
+
+
+
+
 
 
 
