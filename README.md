@@ -8,7 +8,7 @@
 
 ### MySQL
 
-[MySQL (持续更新.. 已经更新至锁)](./MySQL/README.md)
+[MySQL (持续更新.. 已经更新至【事务的原理】)](./MySQL/README.md)
 
 
 

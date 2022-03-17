@@ -810,9 +810,9 @@ MERGE_THREADSHOLD：合并页的阈值，可以自己设置，在创建表或者
 
 ```sql
 -- 删除索引
-DROP INDEX idx_id_card ON emp；
+DROP INDEX idx_id_card ON emp;
 
-EXPLAIN select  *  FROM `emp` order by idcard；
+EXPLAIN select  *  FROM `emp` order by idcard;
 
 
 explain select id, workno, age,idcard  from emp order by workno desc, age desc ,idcard desc;
@@ -1161,19 +1161,77 @@ hash 索引最大优势在于快，因为他只需要一次匹配就可以完成
 create tablespace xxx add datafile 'xxx.ibd' engine = innodb;
 ```
 
+##### General Tablespaces
 
+通用表空间，需要通过`Create tablespace`语法创建通用表空间，在创建表时，可以指定该表空间。
 
+```sql
+CREATE TABLE xxx(...) TABLESPACE xxxx;
+```
 
+##### undo Tablespaces
+
+撤销表空间，MySQL 实例在初始化时会自动创建2个默认的undo表空间(初始大小为16M)，用于存储undo log日志。
+
+##### Temporary Tablespaces
+
+InnoDB 使用会话临时表空间和全局临时表空间。存储用户会话和零时表等等数据。
+
+##### Doublewrite Buffer Files
+
+双写缓冲区，innoDB 引擎将数据页从Buffer Pool 刷新到磁盘前，先将数据写入到双写缓冲区文件中，便于系统异常时恢复数据。
+
+##### Redo Log
+
+Redo Log 是用来实现事务的持久性。该日志文件由两部分组成。重做日志缓冲（redo log buffer）已经重做日志文件（redo log），前者是在内存中，后者在磁盘中。事务提交之后会把所有修改信息都会存到该日志中，用于在刷新脏页到磁盘时，发送错误时，进行数据恢复使用。以循环方式写入重做日志文件。
 
 #### 后台线程
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/04c3467f0e0247df902eeb68ebb0fc8e.png)
+
+后台线程的作用就是将内存里缓冲池的数据在合适的时机刷新到磁盘文件当中。
+
+##### Master Thread
+
+核心后台线程，负责调度其他线程，还负责将缓冲池的数据异步刷新到磁盘中，保持数据一致性，还包括脏页的刷新、合并插入缓存、undo页的回收。
+
+##### IO Thread
+
+在InnoDB 存储引擎中大量使用了AIO 来处理IO 请求，这样可以极大地提高数据库的性能，从IO Thread 主要负责这些IO 请求的回调。
+
+|       线程类型       | 默认个数 |             职责             |
+| :------------------: | :------: | :--------------------------: |
+|     Read thread      |    4     |          负责读操作          |
+|     Write thread     |    4     |          负责写操作          |
+|      Log thread      |    1     |  负责将日志缓冲区刷新到磁盘  |
+| Insert buffer thread |    1     | 负责将写缓冲区内容刷新到磁盘 |
+
+##### Purge Thread
+
+主要用于回收事务已经提交了的undo log，在事务提交之后，undo log 可能不用了，就用它来回收
+
+##### Page Cleaner Thread
+
+协助 Master Thread 刷新脏页到磁盘的线程，他可以减轻Master Thread 的工作压力，减少阻塞。
 
 
 
-
-
+当我们业务在操作的时候会直接操作MySQL 的缓冲区，如果缓冲区内没有数据，会将磁盘的数据加载进来，然后存储在缓冲区当中。在增删改查的时候会操作这个缓冲区里的数据。缓冲区的数据会以一定的频率，一定的时机通过后台线程刷新到磁盘当中，然后才持久化
 
 ### 5.3 事务原理
+
+InnoDB 引擎很重要的一部分就是支持事务。
+
+事务是一组操作的集合，他是一个不可分割的工作单位，事务会把所有的操作作为一个整体一起向系统提交或撤销操作请求，即这些操作要么同事成功，要么同事失败。
+
+特性
+
+* 原子性（Atomicity）：事务是不可分割的最小操作单元，要么全部成功，要么全部失败。
+* 一致性（Consistency）：事务完成时，必须使所有的数据都保持一致状态。
+* 隔离性（Isolation）：数据库系统提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下运行。
+* 持久性（Durability）：事务一旦提交或回滚，它对数据库的数据改变就是永久的。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/ead8e7ef676d47318f5131b3a79e441b.png)
 
 #### redolog
 
