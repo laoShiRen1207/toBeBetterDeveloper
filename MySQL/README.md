@@ -1124,23 +1124,42 @@ MySQL5.5 版本开始，默认使用InnoDB 存储引擎，它擅长事务处理�
 
 ##### Adaptive Hash Index
 
+hash 索引最大优势在于快，因为他只需要一次匹配就可以完成（前提是不存在hash冲突的情况下），B+Tree 往往需要2-3次。但是他的弊端是不能够支持范围查询，只能做等值匹配。所以InnoDB 引擎就做了这个自适应hash 。
+
 自适应hash 索引，用于优化对Buffer Pool 数据查询。InnoDB 存储引擎会监控对表上各索引的查询，如果观察到hash 索引可以提高速度，则建立hash 索引，称之为自适应hash 索引。
 
-**自适应hash 索引，无须人工干预，是系统根据情况自动完成**
+**自适应hash 索引，无须人工干预，是系统根据情况自动完成。**
 
 参数：adaptive_hash_index
 
 ##### Log Buffer 
 
+日志缓冲区，用来保存要写入到磁盘中的log日志数据（redo log，undo log），默认大小是16MB，日志缓冲区的日志会定期刷新到磁盘中。如果需要更新、插入删除许多行的事务，增加日志缓冲区的大小可以节省磁盘I/O。
 
+参数：innodb_log_buffer_size（缓冲区大小），innodb_flush_log_at_trx_commit(日志刷新到磁盘的时机)
 
-
-
-
-
-
+刷新时机默认是1,1 日志在每次事务提交时写入并刷新到磁盘，0 每秒将日志写入并刷新到磁盘一次， 2 日志在每次事务提交后写入并每秒刷新到磁盘一次。
 
 #### 磁盘结构
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/a512f74dbdf7476191ccfd031c1dc2a1.png)
+
+##### System Tablespace
+
+系统表空间是更新缓冲区存储的区域。如果表示在系统表空间而不是每个表文件或者通用表空间中创建的，它也可能包含表和索引的数据（在MySQL5.x版本中还包含InnoDB数据字典、undolog 等）
+
+参数：innodb_data_file_path
+
+##### File-Per-Table Tablespaces
+
+每个表的文件表空间包含单个InnoDB 表的数据和索引，并存储在文件系统上的单个数据文件中。
+
+参数：innodb_file_per_table
+
+```sql
+-- 创建表空间
+create tablespace xxx add datafile 'xxx.ibd' engine = innodb;
+```
 
 
 
