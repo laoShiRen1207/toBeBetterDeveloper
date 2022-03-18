@@ -1,4 +1,4 @@
-# MySQL 学习
+## MySQL 学习
 
 查看版本
 
@@ -1233,48 +1233,116 @@ InnoDB 引擎很重要的一部分就是支持事务。
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/ead8e7ef676d47318f5131b3a79e441b.png)
 
-#### redolog
+#### redo log
 
+我们所讲到的ACID 的持久性就是通过redo log 来保证的。
 
+重做日志，记录的是事务提交时数据页的物理修改，是用来实现事务的持久性。
 
-#### undolog
+该日志文件由两部分组成：重做日志缓冲（redo log buffer）以及重做日志文件（redo log file），前者是在内存中，而后者在磁盘中当事务提交之后会把所有修改信息都存到该日志文件中，用于刷新脏页到磁盘，发生错误时，进行数据恢复使用。
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/d8c3c8ec10a64f3f9c367bc67e6be53b.png)
 
+redo log 保证持久性。
 
+#### undo log
 
+回滚日志，用于记录数据被修改前的信息，作用包含2个：提供回滚和MVCC（多版本并发控制）。
+
+undo log 和 redo log 记录物理日志不一样，它是逻辑日志。可以认为当delete 一条记录时，undo log 中会记录一条对应的insert 的记录，当update 一条记录时，它记录一条相对应相反的update 记录。当执行rollback 时，就可以从undo log 中逻辑记录读取到相应的内容并进行回滚。
+
+undo log 销毁：undo log 在事务执行时，并不会立即删除undo log ，因为这些日志可能还用于MVCC 。
+
+undo log 存储：undo log 采用段的方式进行管理记录。存放在rollback segment 回滚段中，内部包含了1024个undo log segment 。
+
+undo log 保证事务的原子性，而undo log + redo log 保证事务的一致性。
 
 ### 5.4 MVCC
 
 #### 基本概念
 
+##### 当前读
 
+读取的是当前记录的最新版本，读取时还要保证其他并发事务不能修改当前记录，会对读取的记录进行加锁。如：`select lock in share mode`，`select for update`，`update`，`insert`，`update`,`delete`（排他锁）都是一种当前读。
 
+##### 快照读
 
+简单的select(不加锁)就是快照读，读取的是记录数据的可见版本，有可能是历史数据，不加锁，是非阻塞读。
+
+* RC 每次select，都生成快照读（因为每次都生成快照，所以会读到其他事务提交）。
+* RR 开启事务第一个select 语句才是快照读。
+* Serializable 快照读会退化为当前读。
+
+##### MVCC
+
+Mulit-Version Concurrency Control 多版本并发控制。指维护一个数据的多个版本，使得读写操作没有冲突，快照读为MySQL 实现的MVCC 提供了一个非阻塞读功能。MVCC 的具体实现，还需要依赖于数据库记录中的三个隐式字段、unlog 日志 readview。
 
 #### 隐藏字段
 
+InnoDB 在创建表的时候会多创建2个字段，分别是`DB_TRX_ID`，`DB_ROLL_PTR`，~~`DB_ROW_ID`~~。
 
+| 隐式字段 | 含义 |
+| :---: | :----: |
+| DB_TRX_ID | 最近修改事务ID，记录插入这条记录或者最后修改该记录的事务ID |
+| DB_ROLL_PTR | 回滚指针，指向这条记录的上一个版本，用于配合undo log ,指向上一个版本 |
+| DB_ROW_ID | 隐藏主键，如果表结果没有指定主键，将会生成该隐藏字段。 |
 
-#### undolog 版本链
+#### undo log 版本链
 
+回滚日志，在insert update delete 的时候产生的便于数据回滚的日志。
 
+当insert 的时候，产生的undo log 日志只在回滚时需要，在事务提交后，可被立即删除。
 
+而update、delete 的时候产生的undo log 日志不仅在回滚是需要，在快照读时也需要，不会被立即删除。 
 
+##### undo log 版本链
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/deda994a6d674820a58a2a7f90be6b0c.png)
+
+不同事务或者相同事务对同一条记录进行修改，会导致该记录的undo log 生成一条记录版本链表，链表的头部是最新的旧记录，尾部是最旧的记录。
 
 #### readview 介绍
 
+读视图是快照读SQL 执行时MVCC 提取数据的一句，记录并维护系统当前活跃的事务（未提交的）ID
 
+read view 包括了四个核心字段：
 
+|      字段      | 含义 |
+| :----: | :------: |
+|     m_ids      | 当前活跃的事务ID集合 |
+|   min_trx_id   | 最小活跃事务ID |
+|   max_trx_id   | 预分配事务ID，当前最大事务ID+1（事务ID是自增的） |
+| creator_trx_id | Read View 创建者的事务ID |
 
+$$
+版本链数据访问规则
+\begin{cases}
+1. trx—id=creator—trx—id, &可以访问该版本 (当前事务更改的)\\
+2. trx—id < min—trx—id, &可以访问该版本（数据已经提交）\\
+3. trx—id > max—trx—id, &不可以访问该版本（当前事务是在ReadView 生成之后开启的）\\
+4. min—trx—id \le trx—id \le max—trx—id, &如果trx—id不在m-ids中是可以访问该版本的（事务已经提交）
+\end{cases}
+$$
 
+不同的事务隔离级别，生成的readview 的时机不同。
 
+RC 每次都生成 readview ，RR 只在事务第一次执行快照读的时候生成readview，后续复用该readview。
 
 #### 原理分析（RC）
 
+**RC 每次都生成 readview 。**
 
-
-
-
-
+![在这里插入图片描述](https://img-blog.csdnimg.cn/523bf7fa71a44597a819c24b2c572b26.png)
 
 #### 原理分析（RR）
+
+**事务在第一次执行快照读时生成ReadView，后续复用该ReadView。**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/7150cd69a4704ead84afc00af7e443d0.png)
+
+MVCC 主要还是通过隐藏字段（事务id，回滚指针）、undo log 版本链，readview 实现，MVCC + 锁保证了事务的隔离性。
+
+
+
+
+
