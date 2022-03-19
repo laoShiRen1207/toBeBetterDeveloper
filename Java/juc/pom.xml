@@ -35,5 +35,8 @@
     <dependencyManagement>
     </dependencyManagement>
 
+    <build>
+
+    </build>
 
 </project>
