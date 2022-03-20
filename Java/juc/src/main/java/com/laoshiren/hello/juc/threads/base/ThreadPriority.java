@@ -1,4 +1,4 @@
-package com.laoshiren.hello.juc.threads;
+package com.laoshiren.hello.juc.threads.base;
 
 /**
  * ProjectName:     toBeBetterDeveloper
