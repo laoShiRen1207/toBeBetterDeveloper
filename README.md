@@ -18,4 +18,4 @@
 
 #### JUC 
 
-[JUC (持续更新...已更新至多线程篇)](./Java/juc/README.md)
+[JUC (持续更新...已更新至JUC篇)](./Java/juc/README.md)
