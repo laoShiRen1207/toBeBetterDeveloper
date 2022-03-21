@@ -1,4 +1,4 @@
-package com.laoshiren.hello.juc.concurrent.threadsleepsort;
+package com.laoshiren.hello.juc.rethread.threadsleepsort;
 
 /**
  * ProjectName:     juc
