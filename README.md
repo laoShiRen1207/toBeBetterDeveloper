@@ -18,4 +18,4 @@
 
 #### JUC 
 
-[JUC (持续更新...已更新至JUC 锁框架 - AQS加锁 篇)](./Java/juc/README.md)
+[JUC (持续更新...已更新至JUC 锁框架 - AQS加锁篇)](./Java/juc/README.md)

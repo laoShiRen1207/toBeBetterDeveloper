@@ -1,6 +1,6 @@
 ## 代码解析
 仅对 ReentrantLock 公平锁进行代码解析
-```java 
+```java  
 ReentrantLock lock = new ReentrantLock(true);
 lock.lock();
 
