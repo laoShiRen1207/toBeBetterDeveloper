@@ -4144,12 +4144,7 @@ public static ExecutorService newCachedThreadPool() {
 这里我们就可以使用到Future了，它可以返回任务的计算结果，我们可以通过它来获取任务的结果以及任务当前是否完成：
 
 ```java
-public static void main(String[] args) throws InterruptedException, ExecutionException {
-    ExecutorService executor = Executors.newSingleThreadExecutor();   //直接用Executors创建，方便就完事了
-    Future<String> future = executor.submit(() -> "我是字符串!");     //使用submit提交任务，会返回一个Future对象，注意提交的对象可以是Runable也可以是Callable，这里使用的是Callable能够自定义返回值
-    System.out.println(future.get());    //如果任务未完成，get会被阻塞，任务完成返回Callable执行结果返回值
-    executor.shutdown();
-}
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
 当然结果也可以一开始就定义好，然后等待Runnable执行完之后再返回：
