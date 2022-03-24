@@ -18,4 +18,4 @@
 
 #### JUC 
 
-[JUC (持续更新...已更新至JUC 锁框架 - ThreadPoolExecutor篇)](./Java/juc/README.md)
+[JUC (暂停更新...已更新至 ThreadPoolExecutor CountDownLatch工具篇)](./Java/juc/README.md)
