@@ -13,13 +13,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Date:            2022/3/28 17:40
  * Version:         1.0.0
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.laoshiren.hello.springboot"})
 public class SpringBootMain {
 
     public static void main(String[] args) {
-
         SpringApplication.run(SpringBootMain.class, args);
-
     }
 
 }
