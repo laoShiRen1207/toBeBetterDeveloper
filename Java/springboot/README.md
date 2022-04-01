@@ -9,3 +9,7 @@
 
 
 ## @EnableAutoConfiguration
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/d30a92435b6b4b679de4b96254ed644a.png)
+
+[图片地址](https://img-blog.csdnimg.cn/d30a92435b6b4b679de4b96254ed644a.png)

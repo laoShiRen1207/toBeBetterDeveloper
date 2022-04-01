@@ -27,7 +27,7 @@
 [Spring (更新到 IoC 实现原理)](./Java/spring/README.md)
 
 ### spring boot
-[Spring (更新到 run 方法原理)](./Java/springboot/README.md)
+[SpringBoot (更新到 @EnableAutoConfiguration 原理)](./Java/springboot/README.md)
 
 ## MySQL
 
