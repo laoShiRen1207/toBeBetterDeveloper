@@ -28,7 +28,7 @@
 [Spring (更新到 IoC 实现原理,)](./Java/spring/README.md)
 
 ### Mybatis 
-[Mybatis (更新到 池化技术，MapperScan原理)](./Java/spring/REANDME-mybatis.md)
+[Mybatis (更新到 池化技术原理，MapperScan原理)](./Java/spring/REANDME-mybatis.md)
 
 ## spring boot
 
