@@ -20,34 +20,34 @@ import javax.sql.DataSource;
  */
 public class SpringMyBatisMain {
 
-    public static void main(String[] args) {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfiguration.class);
-        TestMapper bean = context.getBean(TestMapper.class);
-        System.out.println(bean);
-    }
+//    public static void main(String[] args) {
+//        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfiguration.class);
+//        TestMapper bean = context.getBean(TestMapper.class);
+//        System.out.println(bean);
+//    }
 
-    @ComponentScan("com.laoshiren.hello.mybatis")
-    @Configuration
-    @MapperScan({"com.laoshiren.hello.mybatis"})
-    public static class MainConfiguration {
-        // 配置 sqlSessionFactory
-
-        @Bean
-        public DataSource dataSource(){
-            HikariDataSource dataSource = new HikariDataSource();
-            dataSource.setJdbcUrl("jdbc:mysql://172.31.2.27/laoshiren");
-            dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-            dataSource.setUsername("root");
-            dataSource.setPassword("root");
-            return dataSource;
-        }
-
-        @Bean
-        public SqlSessionFactoryBean sqlSessionFactoryBean(@Autowired DataSource dataSource){
-            SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
-            bean.setDataSource(dataSource);
-            return bean;
-        }
-
-    }
+//    @ComponentScan("com.laoshiren.hello.mybatis")
+//    @Configuration
+//    @MapperScan({"com.laoshiren.hello.mybatis"})
+//    public static class MainConfiguration {
+//        // 配置 sqlSessionFactory
+//
+//        @Bean
+//        public DataSource dataSource(){
+//            HikariDataSource dataSource = new HikariDataSource();
+//            dataSource.setJdbcUrl("jdbc:mysql://172.31.2.27/laoshiren");
+//            dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+//            dataSource.setUsername("root");
+//            dataSource.setPassword("root");
+//            return dataSource;
+//        }
+//
+//        @Bean
+//        public SqlSessionFactoryBean sqlSessionFactoryBean(@Autowired DataSource dataSource){
+//            SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
+//            bean.setDataSource(dataSource);
+//            return bean;
+//        }
+//
+//    }
 }

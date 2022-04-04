@@ -17,11 +17,11 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
  */
 public class SqlSessionMain {
 
-    public static void main(String[] args) {
-
-//        SqlSessionFactory sqlSessionFactory = new DefaultSqlSessionFactory();
-//        DefaultSqlSession
-
-    }
+//    public static void main(String[] args) {
+//
+//       SqlSessionFactory sqlSessionFactory = new DefaultSqlSessionFactory();
+//       DefaultSqlSession
+//
+//    }
 
 }

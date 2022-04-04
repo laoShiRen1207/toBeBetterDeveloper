@@ -16,10 +16,10 @@ import javax.annotation.PostConstruct;
  */
 //@Component
 public class TestAOP {
-
-    @PostConstruct
-    void init(){
-        System.out.println("初始化了");
-    }
+//
+//    @PostConstruct
+//    void init(){
+//        System.out.println("初始化了");
+//    }
 
 }

@@ -1,4 +1,4 @@
-package com.laoshiren.hello.mybatis;
+package com.laoshiren.hello.spring.transaction.mapper;
 
 import org.apache.ibatis.annotations.Insert;
 
@@ -15,8 +15,8 @@ import java.util.Map;
  * Version:         1.0.0
  */
 public interface TestMapper {
-//
-//    @Insert("insert into test(name) values ('a')")
-//    void insert(Map map);
+
+    @Insert("insert into test(name) values ('a')")
+    void insert(Map map);
 
 }

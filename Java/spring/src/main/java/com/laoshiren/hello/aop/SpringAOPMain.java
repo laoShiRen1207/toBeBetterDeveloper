@@ -18,33 +18,33 @@ import org.springframework.stereotype.Component;
 
 public class SpringAOPMain {
 
-    public static void main(String[] args) {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfiguration.class);
-//        ConfigurableApplicationContext
-        TestAOP bean2 = context.getBean("lbwnb",TestAOP.class);
-        System.out.println(bean2);
-    }
+//    public static void main(String[] args) {
+//        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfiguration.class);
+////        ConfigurableApplicationContext
+//        TestAOP bean2 = context.getBean("lbwnb",TestAOP.class);
+//        System.out.println(bean2);
+//    }
 
 
-    @ComponentScan("com.laoshiren.hello.aop")
-    @Configuration
-    @EnableAspectJAutoProxy
-    @Import(TestProxyBeanDefinitionRegistrar.class)
-    public static class MainConfiguration {
-    }
-
-    @Component
-    public static class TestBeanProcessor implements BeanPostProcessor {
-        @Override
-        public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-            System.out.println(beanName);  //打印bean的名称
-            return bean;
-        }
-
-        @Override
-        public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-            return BeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
-        }
-    }
+//    @ComponentScan("com.laoshiren.hello.aop")
+//    @Configuration
+//    @EnableAspectJAutoProxy
+//    @Import(TestProxyBeanDefinitionRegistrar.class)
+//    public static class MainConfiguration {
+//    }
+//
+//    @Component
+//    public static class TestBeanProcessor implements BeanPostProcessor {
+//        @Override
+//        public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+//            System.out.println(beanName);  //打印bean的名称
+//            return bean;
+//        }
+//
+//        @Override
+//        public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+//            return BeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
+//        }
+//    }
 
 }
